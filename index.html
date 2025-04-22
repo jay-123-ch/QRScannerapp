@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Scanner - Tap to Open Link</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      display: none;
+      border: 2px dashed #4CAF50;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: white;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+      word-wrap: break-word;
+    }
+    .instruction {
+      font-size: 14px;
+      color: #666;
+    }
+    #scan-btn {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #scan-btn:hover {
+      background-color: #388e3c;
+    }
+    a {
+      color: #1976d2;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>QR Scanner</h1>
+  <p class="instruction">Tap the button to scan. If it’s a link, touch to open.</p>
+
+  <button id="scan-btn">Scan Now</button>
+  <div id="reader"></div>
+
+  <div id="result">
+    <strong>Scanned Result:</strong><br>
+    <span id="output">None</span>
+  </div>
+
+  <script>
+    const scanBtn = document.getElementById("scan-btn");
+    const readerDiv = document.getElementById("reader");
+
+    scanBtn.addEventListener("click", () => {
+      readerDiv.style.display = "block";
+
+      const html5QrCode = new Html5Qrcode("reader");
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          html5QrCode.stop().then(() => readerDiv.style.display = "none");
+
+          const output = document.getElementById("output");
+          const isLink = decodedText.match(/^(http|https|upi|paytm|phonepe|paypal):/i);
+
+          if (isLink) {
+            output.innerHTML = `<a href="${decodedText}" target="_blank">${decodedText}</a>`;
+          } else {
+            output.innerText = decodedText;
+          }
+        },
+        (err) => {
+          // Optionally handle scan errors
+        }
+      ).catch(err => alert("Camera error: " + err));
+    });
+  </script>
+</body>
+</html>
